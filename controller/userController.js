@@ -1,0 +1,119 @@
+import Mood from "../model/moodSchema.js";
+import User from "../model/userSchema.js";
+import AppError from "../utils/appError.js";
+import { catchAsync } from "../utils/catchAsync.js";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
+/*global process, a*/
+const filteredOBJ = (obj, ...allowedField) => {
+  let allowed = {};
+  Object.keys(obj).forEach((el) => {
+    if (allowedField.includes(el)) {
+      allowed[el] = obj[el];
+    }
+  });
+  return allowed;
+};
+
+export const getAllUser = async (req, res) => {
+  try {
+    const data = await User.find();
+
+    res.status(200).json({
+      status: "succes",
+      data,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const createUser = catchAsync(async (req, res, next) => {
+  const newUser = await User.create({
+    userName: req.body.userName,
+    email: req.body.email,
+    password: req.body.password,
+    passwordConfirm: req.body.passwordConfirm,
+    role: req.body.role,
+  });
+
+  const token = jwt.sign({ id: newUser._id }, process.env.SECRET, {
+    expiresIn: process.env.JWT_EXPIRES,
+  });
+  res.status(201).json({
+    status: "succes",
+    token,
+    data: newUser,
+  });
+});
+export const deleteUser = catchAsync(async (req, res, next) => {
+  const user = await User.findByIdAndDelete(req.params.id);
+
+  if (!user) {
+    return next(new AppError("No user found with that ID", 404));
+  }
+
+  res.status(204).json({
+    status: "succes",
+    message: "user deleted",
+  });
+});
+
+export const editUser = catchAsync(async (req, res, next) => {
+  if (req.body.password) {
+    req.body.password = await bcrypt.hash(req.body.password, 12);
+  }
+
+  const editedUser = await User.findByIdAndUpdate(
+    req.params.id,
+    {
+      email: req.body.email,
+      userName: req.body.userName,
+      password: req.body.password,
+      role: req.body.role,
+    },
+    {
+      new: true,
+    }
+  );
+
+  if (!editedUser) return next(new AppError("User not found", 404));
+
+  res.status(200).json({
+    status: "succes",
+    data: { editedUser },
+  });
+});
+
+export const getMyMoods = catchAsync(async (req, res) => {
+  const moods = await Mood.find({ user: req.user._id }).sort({ dateAdded: -1 });
+  res.status(200).json({
+    status: "success",
+    results: moods.length,
+    data: moods,
+  });
+});
+
+export const updateMe = catchAsync(async (req, res, next) => {
+  if (req.body.password || req.body.passwordConfirm)
+    return next(new AppError("This route is not for password updates"), 400);
+  const filteredBody = filteredOBJ(req.body, "email");
+  console.log(filteredBody);
+  const updatedUser = await User.findByIdAndUpdate(req.user.id, filteredBody, {
+    new: true,
+    runValidators: true,
+  });
+
+  res.status(200).json({
+    status: "succes",
+    data: { user: updatedUser },
+  });
+});
+
+export const deleteMe = catchAsync(async (req, res, next) => {
+  await User.findByIdAndUpdate(req.user.id, { active: false });
+  res.status(204).json({
+    status: "succes",
+    data: null,
+  });
+});

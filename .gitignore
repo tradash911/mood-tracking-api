@@ -1,0 +1,27 @@
+# Node modules
+node_modules/
+
+# Környezeti változók
+config.env
+
+# Naplófájlok
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS-specifikus
+.DS_Store
+Thumbs.db
+
+# IDE-k és szerkesztők
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Build / cache
+dist/
+build/
+.cache/
