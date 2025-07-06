@@ -38,6 +38,4 @@ router
 router.route("/login").post(login);
 router.route("/signup").post(signup);
 
-/* ;
-router.route("/name/:name").get(getUserByName); */
 export default router;

@@ -73,6 +73,10 @@ export const login = catchAsync(async (req, res, next) => {
 
   ///check eamil and password exist
   if (!email || !password) {
+    /*  res.status(400).json({
+      status: "failed",
+      message: "Please provide email and password",
+    }); */
     return next(new AppError("Please provide email and password", 400));
   }
   ///check user  exits and password is correct
