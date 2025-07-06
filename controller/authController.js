@@ -78,11 +78,11 @@ export const login = catchAsync(async (req, res, next) => {
   ///check user  exits and password is correct
   const user = await User.findOne({ email }).select("+password");
 
-  /* if (!user.active) {
+  if (!user.active) {
     return next(
       new AppError("Please confirm your email to activate your account.", 403)
     );
-  } */
+  }
 
   if (!user || !(await user.correctPassword(password, user.password)))
     return next(new AppError("Incorrect email or password", 401));
