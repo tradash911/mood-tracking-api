@@ -32,7 +32,6 @@ const createSendToken = (user, statusCode, res) => {
 
   res.status(statusCode).json({
     status: "succes",
-    token,
     data: {
       user: user,
     },
@@ -79,7 +78,7 @@ export const login = catchAsync(async (req, res, next) => {
   ///check user  exits and password is correct
   const user = await User.findOne({ email }).select("+password");
 
-  /*   if (!user.active) {
+  /* if (!user.active) {
     return next(
       new AppError("Please confirm your email to activate your account.", 403)
     );
