@@ -14,6 +14,9 @@ import hpp from "hpp";
 /*global process, a*/
 const app = express();
 
+///need for Render
+app.set("trust proxy", 1);
+
 ///security http headers
 app.use(helmet());
 
