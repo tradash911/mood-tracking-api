@@ -11,6 +11,8 @@ import helmet from "helmet";
 import sanitizeRequest from "./utils/sanitizeRequest.js";
 import sanitizeHtmlMiddleware from "./utils/sanitizeHTML.js";
 import hpp from "hpp";
+import cors from "cors";
+
 /*global process, a*/
 const app = express();
 
@@ -25,6 +27,19 @@ dotenv.config({ path: "./config.env" });
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
+
+///cors
+
+///global middlewares
+dotenv.config({ path: "./config.env" });
+
+app.use(
+  cors({
+    origin: "http://localhost:5173", // vagy "*" ha minden frontendet engedsz (kevésbé biztonságos)
+    credentials: true, // ha kell cookie-t vagy auth header-t küldeni
+  })
+);
+
 ///rate limiting
 const limiter = rateLimit({
   max: 100,
