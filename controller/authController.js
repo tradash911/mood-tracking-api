@@ -47,7 +47,7 @@ export const signup = catchAsync(async (req, res, next) => {
     active: false,
   });
 
-  const token = newUser.createEmailConfirmToken();
+  /*   const token = newUser.createEmailConfirmToken();
   await newUser.save({ validateBeforeSave: false });
 
   const confirmURL = `${req.protocol}://${req.get(
@@ -60,7 +60,7 @@ export const signup = catchAsync(async (req, res, next) => {
     email: newUser.email,
     subject: "Confirm your email",
     message,
-  });
+  }); */
 
   res.status(200).json({
     status: "success",
