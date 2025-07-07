@@ -42,7 +42,7 @@ const userSchema = new mongoose.Schema({
     required: [true, "Please enter your password again"],
     validate: {
       validator: function (val) {
-        return val === this.password;
+        return this.password === val;
       },
       message: "your passwords not match!",
     },
