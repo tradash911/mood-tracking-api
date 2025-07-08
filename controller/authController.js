@@ -48,8 +48,6 @@ export const signup = catchAsync(async (req, res, next) => {
     active: false,
   });
 
-
-
   try {
     const token = newUser.createEmailConfirmToken();
     await newUser.save({ validateBeforeSave: false });
@@ -57,7 +55,8 @@ export const signup = catchAsync(async (req, res, next) => {
     const confirmURL = `${req.protocol}://${req.get(
       "host"
     )}/api/v1/users/confirmEmail/${token}`;
-    const message = `Please confirm your email by clicking this link: ${confirmURL}`;
+
+    const message = `<h1>Please confirm your email by clicking this link</h1>: <a>${confirmURL}</a>`;
 
     await sendEmail({
       email: newUser.email,
@@ -79,11 +78,9 @@ export const signup = catchAsync(async (req, res, next) => {
   }
 });
 
-
-
 export const login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
-
+  console.log(req.get("host"));
   ///check eamil and password exist
   if (!email || !password) {
     /*  res.status(400).json({

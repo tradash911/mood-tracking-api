@@ -24,6 +24,7 @@ app.use(helmet());
 
 ///global middlewares
 dotenv.config({ path: "./config.env" });
+
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
