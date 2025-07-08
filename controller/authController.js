@@ -48,9 +48,7 @@ export const signup = catchAsync(async (req, res, next) => {
     active: false,
   });
 
-  if (password !== passwordConfirm) {
-    return next(new AppError("Passwords do not match", 400));
-  }
+
 
   try {
     const token = newUser.createEmailConfirmToken();
@@ -81,35 +79,7 @@ export const signup = catchAsync(async (req, res, next) => {
   }
 });
 
-/* export const signup = catchAsync(async (req, res, next) => {
-  const newUser = await User.create({
-    userName: req.body.userName,
-    email: req.body.email,
-    password: req.body.password,
-    passwordConfirm: req.body.passwordConfirm,
-    active: false,
-  });
 
-  const token = newUser.createEmailConfirmToken();
-  await newUser.save({ validateBeforeSave: false });
-
-  const confirmURL = `${req.protocol}://${req.get(
-    "host"
-  )}/api/v1/users/confirmEmail/${token}`;
-
-  const message = `Please confirm your email by clicking this link: ${confirmURL}`;
-
-  await sendEmail({
-    email: newUser.email,
-    subject: "Confirm your email",
-    message,
-  });
-
-  res.status(200).json({
-    status: "success",
-    message: "Confirmation email sent. Please verify your email.",
-  });
-}); */
 
 export const login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
