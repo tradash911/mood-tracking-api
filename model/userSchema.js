@@ -40,12 +40,12 @@ const userSchema = new mongoose.Schema({
   passwordConfirm: {
     type: String,
     required: [true, "Please enter your password again"],
-    validate: {
+    /*   validate: {
       validator: function (val) {
         return this.password === val;
       },
       message: "your passwords not match!",
-    },
+    }, */
   },
   active: {
     type: Boolean,

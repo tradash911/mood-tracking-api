@@ -39,6 +39,7 @@ const createSendToken = (user, statusCode, res) => {
 };
 
 export const signup = catchAsync(async (req, res, next) => {
+  const { password, passwordConfirm } = req.body;
   const newUser = await User.create({
     userName: req.body.userName,
     email: req.body.email,
@@ -46,6 +47,10 @@ export const signup = catchAsync(async (req, res, next) => {
     passwordConfirm: req.body.passwordConfirm,
     active: false,
   });
+
+  if (password !== passwordConfirm) {
+    return next(new AppError("Passwords do not match", 400));
+  }
 
   try {
     const token = newUser.createEmailConfirmToken();
