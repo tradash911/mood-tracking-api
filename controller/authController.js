@@ -39,7 +39,6 @@ const createSendToken = (user, statusCode, res) => {
 };
 
 export const signup = catchAsync(async (req, res, next) => {
-  const { password, passwordConfirm } = req.body;
   const newUser = await User.create({
     userName: req.body.userName,
     email: req.body.email,
@@ -52,11 +51,14 @@ export const signup = catchAsync(async (req, res, next) => {
     const token = newUser.createEmailConfirmToken();
     await newUser.save({ validateBeforeSave: false });
 
-    const confirmURL = `${req.protocol}://${req.get(
+    /*    const confirmURL = `${req.protocol}://${req.get(
       "host"
-    )}/api/v1/users/confirmEmail/${token}`;
+    )}/api/v1/users/confirmEmail/${token}`; */
 
-    const message = `<h1>Please confirm your email by clicking this link</h1>: <a>${confirmURL}</a>`;
+    const confirmURL = `https://mood-tracking-api.onrender.com/api/v1/users/confirmRegistration/${token}`;
+    console.log("Email confirm token (nyers):", token);
+
+    const message = `<h1>Please confirm your email by clicking this link</h1>: <a href="${confirmURL}">link</a>`;
 
     await sendEmail({
       email: newUser.email,
@@ -230,12 +232,12 @@ export const confirmEmail = catchAsync(async (req, res, next) => {
     .createHash("sha256")
     .update(req.params.token)
     .digest("hex");
-
+  console.log(hashedToken);
   const user = await User.findOne({
     emailConfirmToken: hashedToken,
     emailConfirmExpires: { $gt: Date.now() },
   });
-
+  console.log(user);
   if (!user) {
     return next(new AppError("Token is invalid or has expired", 400));
   }
