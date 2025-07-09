@@ -34,9 +34,16 @@ if (process.env.NODE_ENV === "development") {
 ///global middlewares
 dotenv.config({ path: "./config.env" });
 
-app.use(
+/* app.use(
   cors({
     origin: "http://localhost:5173", // vagy "*" ha minden frontendet engedsz (kevésbé biztonságos)
+    credentials: true, // ha kell cookie-t vagy auth header-t küldeni
+  })
+); */
+
+app.use(
+  cors({
+    origin: "https://wondrous-truffle-e8153b.netlify.app/", // vagy "*" ha minden frontendet engedsz (kevésbé biztonságos)
     credentials: true, // ha kell cookie-t vagy auth header-t küldeni
   })
 );

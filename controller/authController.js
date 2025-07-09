@@ -22,8 +22,8 @@ const createSendToken = (user, statusCode, res) => {
     ),
     httpOnly: true,
     path: "/",
-    sameSite: "Lax",
-    secure: false,
+    sameSite: "None",
+    secure: true,
   };
   /* if (process.env.NODE_ENV === "production") cookieOptions.secure = true; */
 
