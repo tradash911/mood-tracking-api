@@ -43,7 +43,7 @@ dotenv.config({ path: "./config.env" });
 
 const allowedOrigins = [
   "https://wondrous-truffle-e8153b.netlify.app",
-  "http://localhost:5173/",
+  "http://localhost:5173",
 ];
 
 app.use(
