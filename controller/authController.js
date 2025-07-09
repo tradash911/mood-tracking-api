@@ -21,8 +21,8 @@ const createSendToken = (user, statusCode, res) => {
       Date.now() + process.env.JWT_COOKIES_EXPIRES_IN * 24 * 60 * 60 * 1000
     ),
     httpOnly: true,
-
-    sameSite: "None",
+    path: "/",
+    sameSite: "Lax",
     secure: false,
   };
   /* if (process.env.NODE_ENV === "production") cookieOptions.secure = true; */
