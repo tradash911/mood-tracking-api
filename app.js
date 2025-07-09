@@ -43,7 +43,7 @@ dotenv.config({ path: "./config.env" });
 
 app.use(
   cors({
-    origin: "https://wondrous-truffle-e8153b.netlify.app/", // vagy "*" ha minden frontendet engedsz (kevésbé biztonságos)
+    origin: "*", // vagy "*" ha minden frontendet engedsz (kevésbé biztonságos)
     credentials: true, // ha kell cookie-t vagy auth header-t küldeni
   })
 );
