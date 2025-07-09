@@ -55,7 +55,7 @@ export const signup = catchAsync(async (req, res, next) => {
       "host"
     )}/api/v1/users/confirmEmail/${token}`; */
 
-    const confirmURL = `https://mood-tracking-api.onrender.com/api/v1/users/confirmRegistration/${token}`;
+    const confirmURL = `${req.protocol}://localhost:5173/confirmEmail/${token}`;
     console.log("Email confirm token (nyers):", token);
 
     const message = `<h1>Please confirm your email by clicking this link</h1>: <a href="${confirmURL}">link</a>`;
