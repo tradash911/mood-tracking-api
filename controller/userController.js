@@ -88,7 +88,7 @@ export const editUser = catchAsync(async (req, res, next) => {
 export const getMyMoods = catchAsync(async (req, res) => {
   console.log(req.user);
   console.log("get my moods");
-  const moods = await Mood.find({ user: req.user._id }).sort({ dateAdded: -1 });
+  const moods = await Mood.find({ user: req.user.id }).sort({ dateAdded: -1 });
   res.status(200).json({
     status: "success",
     results: moods.length,
