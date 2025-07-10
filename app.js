@@ -12,6 +12,7 @@ import sanitizeRequest from "./utils/sanitizeRequest.js";
 import sanitizeHtmlMiddleware from "./utils/sanitizeHTML.js";
 import hpp from "hpp";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 
 /*global process, a*/
 const app = express();
@@ -21,6 +22,8 @@ app.set("trust proxy", 1);
 
 ///security http headers
 app.use(helmet());
+
+app.use(cookieParser());
 
 ///global middlewares
 dotenv.config({ path: "./config.env" });
