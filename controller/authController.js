@@ -23,9 +23,8 @@ const createSendToken = (user, statusCode, res) => {
     httpOnly: true,
     path: "/",
     sameSite: "None",
-    secure: true,
   };
-  /* if (process.env.NODE_ENV === "production") cookieOptions.secure = true; */
+  if (process.env.NODE_ENV === "production") cookieOptions.secure = true;
 
   res.cookie("jwt", token, cookieOptions);
 
@@ -54,12 +53,7 @@ export const signup = catchAsync(async (req, res, next) => {
     const token = newUser.createEmailConfirmToken();
     await newUser.save({ validateBeforeSave: false });
 
-    /*    const confirmURL = `${req.protocol}://${req.get(
-      "host"
-    )}/api/v1/users/confirmEmail/${token}`; */
-
     const confirmURL = `${req.protocol}://localhost:5173/confirmEmail/${token}`;
-    console.log("Email confirm token (nyers):", token);
 
     const message = `<h1>Please confirm your email by clicking this link</h1>: <a href="${confirmURL}">link</a>`;
 
