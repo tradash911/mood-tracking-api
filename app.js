@@ -34,31 +34,10 @@ if (process.env.NODE_ENV === "development") {
 ///global middlewares
 dotenv.config({ path: "./config.env" });
 
-/* app.use(
-  cors({
-    origin: "http://localhost:5173", // vagy "*" ha minden frontendet engedsz (kevésbé biztonságos)
-    credentials: true, // ha kell cookie-t vagy auth header-t küldeni
-  })
-); */
-
-const allowedOrigins = [
-  "https://wondrous-truffle-e8153b.netlify.app",
-  "http://localhost:5173",
-];
-
 app.use(
   cors({
-    origin: function (origin, callback) {
-      // Engedélyezzük, ha nincs origin (pl. Postman), vagy ha benne van az engedélyezettek között
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.indexOf(origin) === -1) {
-        const msg =
-          "The CORS policy for this site does not allow access from the specified Origin.";
-        return callback(new Error(msg), false);
-      }
-      return callback(null, true);
-    },
-    credentials: true, // ezt be kell kapcsolni a cookie-k engedélyezéséhez
+    origin: "https://wondrous-truffle-e8153b.netlify.app", // csak ezt engedd!
+    credentials: true,
   })
 );
 
