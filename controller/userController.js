@@ -119,3 +119,14 @@ export const deleteMe = catchAsync(async (req, res, next) => {
     data: null,
   });
 });
+
+export const getMe = catchAsync(async (req, res, next) => {
+  if (!req.user) {
+    return next(new AppError("Not logged in", 401));
+  }
+
+  res.status(200).json({
+    status: "success",
+    data: { user: req.user },
+  });
+});

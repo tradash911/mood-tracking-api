@@ -5,6 +5,7 @@ import {
   deleteUser,
   editUser,
   getAllUser,
+  getMe,
   getMyMoods,
   updateMe,
 } from "../controller/userController.js";
@@ -24,6 +25,7 @@ router
   .route("/")
   .get(protect, restrictTo("admin"), getAllUser)
   .post(protect, restrictTo("admin"), createUser);
+router.get("/me", protect, getMe);
 router.route("/myMoods").get(protect, getMyMoods);
 router.route("/confirmRegistration/:token").get(confirmEmail);
 router.route("/forgotPassword").post(forgotPassword);
