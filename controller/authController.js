@@ -99,6 +99,19 @@ export const login = catchAsync(async (req, res, next) => {
   createSendToken(user, 200, res);
 });
 
+export const logout = (req, res) => {
+  res.cookie("jwt", "loggedout", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "None", // vagy "None" ha cross-origin frontend
+    expires: new Date(Date.now() + 10 * 1000), // 10 mp múlva lejár
+  });
+
+  res
+    .status(200)
+    .json({ status: "success", message: "Logged out successfully" });
+};
+
 export const protect = catchAsync(async (req, res, next) => {
   let token;
   ///get token and check if it is exits

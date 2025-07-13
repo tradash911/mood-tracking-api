@@ -13,6 +13,7 @@ import {
   confirmEmail,
   forgotPassword,
   login,
+  logout,
   protect,
   resetPassword,
   restrictTo,
@@ -25,6 +26,7 @@ router
   .route("/")
   .get(protect, restrictTo("admin"), getAllUser)
   .post(protect, restrictTo("admin"), createUser);
+router.get("/logout", logout);
 router.get("/me", protect, getMe);
 router.route("/myMoods").get(protect, getMyMoods);
 router.route("/confirmRegistration/:token").get(confirmEmail);
