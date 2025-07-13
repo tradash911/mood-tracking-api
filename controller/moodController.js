@@ -34,6 +34,7 @@ export const createMood = catchAsync(async (req, res, next) => {
   );
 
   if (new Date() > user.canCreateMood) {
+    user.canCreateMood = midnightUTC;
     await user.save({ validateBeforeSave: false });
     const data = await Mood.create({
       mood: req.body.mood,
@@ -42,7 +43,6 @@ export const createMood = catchAsync(async (req, res, next) => {
       photo: req.body.photo,
       user: req.user._id,
     });
-    user.canCreateMood = midnightUTC;
     res.status(200).json({
       message: "Mood created",
       data,
