@@ -85,11 +85,32 @@ export const editUser = catchAsync(async (req, res, next) => {
   });
 });
 
-export const getMyMoods = catchAsync(async (req, res) => {
+/* export const getMyMoods = catchAsync(async (req, res) => {
   const moods = await Mood.find({ user: req.user.id }).sort({ dateAdded: -1 });
   res.status(200).json({
     status: "success",
     results: moods.length,
+    data: moods,
+  });
+}); */
+
+export const getMyMoods = catchAsync(async (req, res) => {
+  const page = parseInt(req.query.page, 10) || 1;
+  const limit = parseInt(req.query.limit, 10) || 10;
+  const skip = (page - 1) * limit;
+
+  const moods = await Mood.find({ user: req.user.id })
+    .sort({ dateAdded: -1 })
+    .skip(skip)
+    .limit(limit);
+
+  const total = await Mood.countDocuments({ user: req.user.id });
+
+  res.status(200).json({
+    status: "success",
+    results: moods.length,
+    page,
+    totalPages: Math.ceil(total / limit),
     data: moods,
   });
 });
