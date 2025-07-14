@@ -167,7 +167,7 @@ export const forgotPassword = catchAsync(async function (req, res, next) {
   await user.save({ validateBeforeSave: false });
 
   const frontendBaseUrl = process.env.FRONTEND_URL || "http://localhost:5173";
-  const resetURL = `${frontendBaseUrl}/resetPassword/${resetToken}`;
+  const resetURL = `${frontendBaseUrl}/confirmResetPassword/${resetToken}`;
   /* 
   const resetURL = `${req.protocol}://${req.get(
     "host"
