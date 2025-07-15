@@ -1,6 +1,7 @@
 import multer from "multer";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 import cloudinary from "../utils/cloudinary.js";
+import AppError from "../utils/appError.js";
 
 const storage = new CloudinaryStorage({
   cloudinary,
@@ -15,7 +16,7 @@ const fileFilter = (req, file, cb) => {
   if (allowedTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error("Only JPG, JPEG, and PNG files are allowed."), false);
+    cb(new AppError("Only JPG, JPEG, and PNG files are allowed."), false);
   }
 };
 
