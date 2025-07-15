@@ -151,12 +151,20 @@ export const getMe = catchAsync(async (req, res, next) => {
 });
 
 export const updateAvatar = async (req, res) => {
+  console.log("User in req.user:", req.user);
+  console.log("File in req.file:", req.file);
+
   try {
-    const user = await User.findById(req.user.id); // csak ha van auth
-    user.photo = req.file.path; // Cloudinary visszaadja a linket
+    if (!req.user || !req.file) {
+      return res.status(400).json({ message: "Missing user or file" });
+    }
+
+    const user = await User.findById(req.user.id);
+    user.photo = req.file.path;
     await user.save();
     res.status(200).json({ photo: user.photo });
   } catch (err) {
+    console.error("Upload error:", err);
     res.status(500).json({ message: "Error uploading avatar" });
   }
 };
