@@ -168,10 +168,6 @@ export const forgotPassword = catchAsync(async function (req, res, next) {
 
   const frontendBaseUrl = process.env.FRONTEND_URL || "http://localhost:5173";
   const resetURL = `${frontendBaseUrl}/confirmResetPassword/${resetToken}`;
-  /* 
-  const resetURL = `${req.protocol}://${req.get(
-    "host"
-  )}/api/v1/resetPassword/${resetToken}`; */
 
   const message = `Forgot your password? reset here${resetURL} \n If you didn't, please ignore this email!`;
 
@@ -216,10 +212,6 @@ export const resetPassword = catchAsync(async (req, res, next) => {
 
   await user.save();
   createSendToken(user, 200, res);
-
-  ///Update passwordChangedAt at property for the user
-
-  ///Log the user in and send JWT
 });
 
 export const updatePassword = catchAsync(async function (req, res, next) {
@@ -233,7 +225,18 @@ export const updatePassword = catchAsync(async function (req, res, next) {
   if (!currentPassword)
     return next(new AppError("Please enter you current password", 401));
 
+  const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/;
+  if (!strongPasswordRegex.test(req.body.newPassword)) {
+    return next(
+      new AppError(
+        "Password must contain at least one lowercase letter, one uppercase letter, and one number.",
+        400
+      )
+    );
+  }
+
   user.password = req.body.newPassword;
+
   await user.save({ validateBeforeSave: false });
   createSendToken(user, 200, res);
 });
