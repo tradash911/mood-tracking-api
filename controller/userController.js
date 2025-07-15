@@ -153,9 +153,9 @@ export const getMe = catchAsync(async (req, res, next) => {
 export const updateAvatar = async (req, res) => {
   try {
     const user = await User.findById(req.user.id); // csak ha van auth
-    user.avatarUrl = req.file.path; // Cloudinary visszaadja a linket
+    user.photo = req.file.path; // Cloudinary visszaadja a linket
     await user.save();
-    res.status(200).json({ avatarUrl: user.avatarUrl });
+    res.status(200).json({ photo: user.photo });
   } catch (err) {
     res.status(500).json({ message: "Error uploading avatar" });
   }
