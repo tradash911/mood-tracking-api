@@ -161,7 +161,7 @@ export const updateAvatar = async (req, res) => {
 
     const user = await User.findById(req.user.id);
     user.photo = req.file.path;
-    await user.save();
+    await user.save({ validateBeforeSave: false });
     res.status(200).json({ photo: user.photo });
   } catch (err) {
     console.error("Upload error:", err);
