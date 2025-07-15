@@ -149,3 +149,14 @@ export const getMe = catchAsync(async (req, res, next) => {
     data: { user: req.user },
   });
 });
+
+export const updateAvatar = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id); // csak ha van auth
+    user.avatarUrl = req.file.path; // Cloudinary visszaadja a linket
+    await user.save();
+    res.status(200).json({ avatarUrl: user.avatarUrl });
+  } catch (err) {
+    res.status(500).json({ message: "Error uploading avatar" });
+  }
+};

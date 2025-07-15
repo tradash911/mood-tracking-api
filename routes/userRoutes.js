@@ -7,6 +7,7 @@ import {
   getAllUser,
   getMe,
   getMyMoods,
+  updateAvatar,
   updateMe,
 } from "../controller/userController.js";
 import {
@@ -20,6 +21,7 @@ import {
   signup,
   updatePassword,
 } from "../controller/authController.js";
+import { upload } from "../middlewares/upload.js";
 
 const router = express.Router();
 router
@@ -36,6 +38,9 @@ router.route("/editUser/:id").patch(protect, restrictTo("admin"), editUser);
 router.route("/updatePassword").patch(protect, updatePassword);
 router.route("/updateMe").patch(protect, updateMe);
 router.route("/deleteMe").delete(protect, deleteMe);
+router
+  .route("/upload-avatar")
+  .post(protect, upload.single("avatar"), updateAvatar);
 router
   .route("/deleteUser/:id")
   .delete(protect, restrictTo("admin"), deleteUser);

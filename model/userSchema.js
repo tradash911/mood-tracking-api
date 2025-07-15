@@ -40,7 +40,7 @@ const userSchema = new mongoose.Schema({
   passwordConfirm: {
     type: String,
     required: [true, "Please enter your password again"],
-      validate: {
+    validate: {
       validator: function (val) {
         return this.password === val;
       },
@@ -55,6 +55,7 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+
   photo: String,
   passwordChangedAt: Date,
   passwordResetToken: String,
