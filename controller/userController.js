@@ -4,6 +4,7 @@ import AppError from "../utils/appError.js";
 import { catchAsync } from "../utils/catchAsync.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
+import cloudinary from "../utils/cloudinary.js";
 /*global process, a*/
 const filteredOBJ = (obj, ...allowedField) => {
   let allowed = {};
@@ -85,15 +86,6 @@ export const editUser = catchAsync(async (req, res, next) => {
   });
 });
 
-/* export const getMyMoods = catchAsync(async (req, res) => {
-  const moods = await Mood.find({ user: req.user.id }).sort({ dateAdded: -1 });
-  res.status(200).json({
-    status: "success",
-    results: moods.length,
-    data: moods,
-  });
-}); */
-
 export const getMyMoods = catchAsync(async (req, res) => {
   const page = parseInt(req.query.page, 10) || 1;
   const limit = parseInt(req.query.limit, 10) || 10;
@@ -150,18 +142,28 @@ export const getMe = catchAsync(async (req, res, next) => {
   });
 });
 
-export const updateAvatar = async (req, res) => {
-  console.log("User in req.user:", req.user);
-  console.log("File in req.file:", req.file);
-
+export const updateAvatar = async (req, res, next) => {
   try {
     if (!req.user || !req.file) {
       return res.status(400).json({ message: "Missing user or file" });
     }
 
     const user = await User.findById(req.user.id);
+
+    // 1️⃣ If the user already has a photo, delete the old one from Cloudinary
+    if (user.photo) {
+      // Example URL: https://res.cloudinary.com/dmc6rylhm/image/upload/v1752568972/user-avatars/rmwlzc057ucasqjq4bc0.jpg
+      const parts = user.photo.split("/");
+      const filenameWithExt = parts[parts.length - 1]; // e.g., "rmwlzc057ucasqjq4bc0.jpg"
+      const publicId = `user-avatars/${filenameWithExt.split(".")[0]}`; // e.g., "user-avatars/rmwlzc057ucasqjq4bc0"
+
+      await cloudinary.uploader.destroy(publicId);
+    }
+
+    // 2️⃣ Save the new photo URL from Cloudinary
     user.photo = req.file.path;
     await user.save({ validateBeforeSave: false });
+
     res.status(200).json({ photo: user.photo });
   } catch (err) {
     console.error("Upload error:", err);
