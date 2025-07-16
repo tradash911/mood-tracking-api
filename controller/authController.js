@@ -266,8 +266,6 @@ export const confirmEmail = catchAsync(async (req, res, next) => {
   createSendToken(user, 200, res);
 });
 
-//// TESZT
-//// TESZT
 export const changeEmailAddress = catchAsync(async function (req, res, next) {
   const isEmailInUse = await User.findOne({ email: req.body.nextEmail });
 
