@@ -53,9 +53,10 @@ export const signup = catchAsync(async (req, res, next) => {
     const token = newUser.createEmailConfirmToken();
     await newUser.save({ validateBeforeSave: false });
 
-    const confirmURL = `${req.protocol}://localhost:5173/confirmEmail/${token}`;
+    const frontendBaseUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+    const confirmURL = `${frontendBaseUrl}/confirmEmail/${token}`;
 
-    const message = `<h1>Please confirm your email by clicking this link</h1>: <a href="${confirmURL}">link</a>`;
+    const message = `Please confirm your email by clicking <a href="${confirmURL}">here</a>. \n If you didn’t request this, please ignore this email.`;
 
     await sendEmail({
       email: newUser.email,
@@ -103,8 +104,8 @@ export const logout = (req, res) => {
   res.cookie("jwt", "loggedout", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "None", // vagy "None" ha cross-origin frontend
-    expires: new Date(Date.now() + 10 * 1000), // 10 mp múlva lejár
+    sameSite: "None", // or "None" for cross-origin frontend
+    expires: new Date(Date.now() + 10 * 1000),
   });
 
   res
@@ -169,7 +170,7 @@ export const forgotPassword = catchAsync(async function (req, res, next) {
   const frontendBaseUrl = process.env.FRONTEND_URL || "http://localhost:5173";
   const resetURL = `${frontendBaseUrl}/confirmResetPassword/${resetToken}`;
 
-  const message = `Forgot your password? reset here${resetURL} \n If you didn't, please ignore this email!`;
+  const message = `Forgot your password? reset <a href="${resetURL}"> here <a/>  \n If you didn't, please ignore this email!`;
 
   try {
     await sendEmail({
@@ -186,7 +187,7 @@ export const forgotPassword = catchAsync(async function (req, res, next) {
     (user.passwordResetToken = undefined),
       (user.passwordResetExpires = undefined);
     await user.save({ validateBeforeSave: false });
-    return next(new AppError("there was an error sending the email", 400));
+    return next(new AppError("There was an error sending the email", 400));
   }
 });
 
@@ -226,6 +227,7 @@ export const updatePassword = catchAsync(async function (req, res, next) {
     return next(new AppError("Please enter you current password", 401));
 
   const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/;
+
   if (!strongPasswordRegex.test(req.body.newPassword)) {
     return next(
       new AppError(
@@ -246,12 +248,12 @@ export const confirmEmail = catchAsync(async (req, res, next) => {
     .createHash("sha256")
     .update(req.params.token)
     .digest("hex");
-  console.log(hashedToken);
+
   const user = await User.findOne({
     emailConfirmToken: hashedToken,
     emailConfirmExpires: { $gt: Date.now() },
   });
-  console.log(user);
+
   if (!user) {
     return next(new AppError("Token is invalid or has expired", 400));
   }
@@ -261,5 +263,70 @@ export const confirmEmail = catchAsync(async (req, res, next) => {
   user.emailConfirmExpires = undefined;
   await user.save({ validateBeforeSave: false });
 
+  createSendToken(user, 200, res);
+});
+
+//// TESZT
+//// TESZT
+export const changeEmailAddress = catchAsync(async function (req, res, next) {
+  const isEmailInUse = await User.findOne({ email: req.body.nextEmail });
+
+  const user = await User.findOne({ email: req.user.email });
+
+  if (!user) {
+    return next(new AppError("Please log in!", 404));
+  }
+
+  if (isEmailInUse)
+    return next(new AppError("This email address is already in use", 400));
+
+  ///Token generálása
+  const resetToken = user.createEmailChangeToken();
+  user.nextEmailAddress = req.body.nextEmail;
+  await user.save({ validateBeforeSave: false });
+
+  const frontendBaseUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+  const resetURL = `${frontendBaseUrl}/confirmChangeEmail/${resetToken}`;
+
+  const message = `To change your email address, please click the following link: <a href="${resetURL}"> click here <a/> \n If you did not request this change, please disregard this message.`;
+
+  try {
+    await sendEmail({
+      email: user.email,
+      subject: "Change email",
+      message,
+    });
+
+    res.status(200).json({
+      status: "succes",
+      message:
+        "Confirmation email has been sent. Please check your current inbox.",
+    });
+  } catch (error) {
+    (user.emailChangeToken = undefined),
+      (user.emailChangeTokenExpires = undefined);
+    await user.save({ validateBeforeSave: false });
+    return next(new AppError("there was an error sending the email", 400));
+  }
+});
+
+export const confirmChangeEmailAddress = catchAsync(async (req, res, next) => {
+  const hashedToken = crypto
+    .createHash("sha256")
+    .update(req.params.token)
+    .digest("hex");
+
+  const user = await User.findOne({
+    emailChangeToken: hashedToken,
+    emailChangeTokenExpires: { $gt: new Date() },
+  });
+
+  if (!user) return next(new AppError("Token is invalid or has expired", 400));
+
+  user.email = user.nextEmailAddress;
+  user.emailChangeToken = undefined;
+  user.emailChangeTokenExpires = undefined;
+
+  await user.save({ validateBeforeSave: false });
   createSendToken(user, 200, res);
 });

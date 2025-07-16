@@ -11,6 +11,8 @@ import {
   updateMe,
 } from "../controller/userController.js";
 import {
+  changeEmailAddress,
+  confirmChangeEmailAddress,
   confirmEmail,
   forgotPassword,
   login,
@@ -34,6 +36,8 @@ router.route("/myMoods").get(protect, getMyMoods);
 router.route("/confirmRegistration/:token").get(confirmEmail);
 router.route("/forgotPassword").post(forgotPassword);
 router.route("/resetPassword/:token").patch(resetPassword);
+router.route("/changeEmail").patch(protect, changeEmailAddress);
+router.route("/confirmChangeEmail/:token").patch(confirmChangeEmailAddress);
 router.route("/editUser/:id").patch(protect, restrictTo("admin"), editUser);
 router.route("/updatePassword").patch(protect, updatePassword);
 router.route("/updateMe").patch(protect, updateMe);

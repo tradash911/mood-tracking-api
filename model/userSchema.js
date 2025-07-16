@@ -62,6 +62,9 @@ const userSchema = new mongoose.Schema({
   passwordResetExpires: Date,
   emailConfirmToken: String,
   emailConfirmExpires: Date,
+  emailChangeToken: String,
+  emailChangeTokenExpires: Date,
+  nextEmailAddress: String,
 });
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
@@ -88,7 +91,6 @@ userSchema.pre("save", function (next) {
 userSchema.methods.changedPasswordAfter = function (JTWTimestamp) {
   if (this.passwordChangedAt) {
     const changedAt = parseInt(this.passwordChangedAt.getTime() / 1000, 10);
-    console.log(changedAt, JTWTimestamp);
     return JTWTimestamp < changedAt;
   }
   ///False means not changed
@@ -116,6 +118,16 @@ userSchema.methods.createEmailConfirmToken = function () {
     .digest("hex");
   this.emailConfirmExpires = Date.now() + 10 * 60 * 1000;
 
+  return token;
+};
+//// TESZT
+//// TESZT
+userSchema.methods.createEmailChangeToken = function () {
+  const token = crypto.randomBytes(32).toString("hex");
+  const hashed = crypto.createHash("sha256").update(token).digest("hex");
+
+  this.emailChangeToken = hashed;
+  this.emailChangeTokenExpires = Date.now() + 10 * 60 * 1000; // 10 perc
   return token;
 };
 
