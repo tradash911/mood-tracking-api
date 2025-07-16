@@ -326,6 +326,7 @@ export const confirmChangeEmailAddress = catchAsync(async (req, res, next) => {
   user.email = user.nextEmailAddress;
   user.emailChangeToken = undefined;
   user.emailChangeTokenExpires = undefined;
+  user.nextEmailAddress = undefined;
 
   await user.save({ validateBeforeSave: false });
   createSendToken(user, 200, res);
