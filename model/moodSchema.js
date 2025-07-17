@@ -10,6 +10,40 @@ const moodSchema = new mongoose.Schema(
         message: "Mood is either: 1,2,3,4,5",
       },
     },
+    feelings: {
+      type: [String],
+      validate: {
+        validator: (val) => {
+          val.length <= 3;
+        },
+        message: "You can select up to 3 feelings",
+      },
+      enum: {
+        values: [
+          "Joyful",
+          "Down",
+          "Anxious",
+          "Calm",
+          "Excited",
+          "Frustrated",
+          "Lonely",
+          "Grateful",
+          "Overwhelmed",
+          "Motivated",
+          "Irritable",
+          "Peaceful",
+          "Tired",
+          "Hopeful",
+          "Confident",
+          "Stressed",
+          "Content",
+          "Disappointed",
+          "Optimistic",
+          "Restless",
+        ],
+        message: "Invalid feeling: `{VALUE}`",
+      },
+    },
     dateAdded: {
       type: String,
       default: () => format(new Date(), "yyyy-MM-dd HH:mm:ss"),

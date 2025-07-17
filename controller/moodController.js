@@ -40,6 +40,7 @@ export const createMood = catchAsync(async (req, res, next) => {
       log: req.body.log,
       photo: req.body.photo,
       user: req.user._id,
+      feelings: req.body.feelings,
     });
     user.canCreateMood = midnightUTC;
     await user.save({ validateBeforeSave: false });
