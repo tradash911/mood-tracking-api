@@ -67,7 +67,7 @@ export const signup = catchAsync(async (req, res, next) => {
     res.status(200).json({
       status: "success",
       message: "Confirmation email sent. Please verify your email.",
-      newUser,
+      newUser: newUser.email,
     });
   } catch (err) {
     console.error("Signup email error:", err.message);
