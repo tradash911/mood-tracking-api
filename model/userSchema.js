@@ -6,7 +6,7 @@ const userSchema = new mongoose.Schema({
   userName: {
     type: String,
     required: [true, "Please enter a name"],
-    unique: [true, "username alreay exists"],
+    unique: [true, "Username alreay exists"],
   },
   password: {
     type: String,
@@ -44,7 +44,7 @@ const userSchema = new mongoose.Schema({
       validator: function (val) {
         return this.password === val;
       },
-      message: "your passwords not match!",
+      message: "Your passwords not match!",
     },
   },
   active: {

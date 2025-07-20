@@ -74,6 +74,7 @@ export const signup = catchAsync(async (req, res, next) => {
     res.status(200).json({
       status: "success",
       message: "Signed up, but email sending failed. Try confirming later.",
+      newUser,
     });
   }
 });
