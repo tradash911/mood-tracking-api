@@ -88,7 +88,7 @@ export const editUser = catchAsync(async (req, res, next) => {
 
 export const getMyMoods = catchAsync(async (req, res) => {
   const page = parseInt(req.query.page, 10) || 1;
-  const limit = parseInt(req.query.limit, 10) || 10;
+  const limit = parseInt(req.query.limit, 10) || 11;
   const skip = (page - 1) * limit;
 
   const moods = await Mood.find({ user: req.user.id })
