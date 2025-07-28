@@ -68,6 +68,9 @@ const moodSchema = new mongoose.Schema(
       ref: "User", // ez itt a kapcsolat,
       required: true,
     },
+    quote: {
+      type: String,
+    },
   },
 
   {
