@@ -40,7 +40,8 @@ dotenv.config({ path: "./config.env" });
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    /* origin: "http://localhost:5173", */
+    origin: "https://wondrous-truffle-e8153b.netlify.app/",
     credentials: true,
   })
 );
