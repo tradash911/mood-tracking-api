@@ -22,8 +22,8 @@ const createSendToken = (user, statusCode, res) => {
     ),
     httpOnly: true,
     path: "/",
-    sameSite: "none", // <- kisbetű!
-    secure: process.env.NODE_ENV === "production", // mindig együtt a sameSite none-nal
+    sameSite: "none",
+    secure: process.env.NODE_ENV === "production",
   };
 
   res.cookie("jwt", token, cookieOptions);
