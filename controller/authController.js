@@ -7,7 +7,8 @@ import { sendEmail } from "../utils/emails.js";
 import crypto from "crypto";
 import bcrypt from "bcryptjs";
 /*global process, a*/
-const signToken = (user) => {
+
+/* const signToken = (user) => {
   const token = jwt.sign({ id: user }, process.env.SECRET, {
     expiresIn: process.env.JWT_EXPIRES,
   });
@@ -26,30 +27,54 @@ const createSendToken = (user, statusCode, res) => {
     secure: true,
   };
 
-  /*  if (process.env.NODE_ENV === "production") cookieOptions.secure = true; */
+   //  if (process.env.NODE_ENV === "production") cookieOptions.secure = true; 
 
   res.cookie("jwt", token, cookieOptions);
-  /*  const cookieOptions = {
-    expires: new Date(
-      Date.now() + process.env.JWT_COOKIES_EXPIRES_IN * 24 * 60 * 60 * 1000
-    ),
-    httpOnly: true,
-    path: "/",
-    sameSite: "None",
-  };
-  if (process.env.NODE_ENV === "production") cookieOptions.secure = true;
+  //  const cookieOptions = {
+  //  expires: new Date(
+  //    Date.now() + process.env.JWT_COOKIES_EXPIRES_IN * 24 * 60 * 60 * 1000
+  //  ),
+  //  httpOnly: true,
+  //  path: "/",
+  //  sameSite: "None",
+  //  };
+  // if (process.env.NODE_ENV === "production") cookieOptions.secure = true;
 
-  res.cookie("jwt", token, cookieOptions); */
+  res.cookie("jwt", token, cookieOptions);
 
   ///Remove the password from the output
-
-  console.log("Set-Cookie header:", res.getHeaders()["set-cookie"]);
-
   user.password = undefined;
 
   res.status(statusCode).json({
     status: "succes",
     token,
+    data: {
+      user,
+    },
+  });
+}; */
+
+///JWT LOCAL VERSION
+///JWT LOCAL VERSION
+///JWT LOCAL VERSION
+const signToken = (user) => {
+  return jwt.sign({ id: user }, process.env.SECRET, {
+    expiresIn: process.env.JWT_EXPIRES,
+  });
+};
+
+const createSendToken = (user, statusCode, res) => {
+  const token = signToken(user._id);
+
+  // Cookie rész eltávolítva
+  // res.cookie("jwt", token, cookieOptions); → nincs
+
+  // Jelszó törlése a visszaküldés előtt
+  user.password = undefined;
+
+  res.status(statusCode).json({
+    status: "success",
+    token, // JWT JSON-ban visszaadva
     data: {
       user,
     },
@@ -132,6 +157,38 @@ export const logout = (req, res) => {
 
 export const protect = catchAsync(async (req, res, next) => {
   let token;
+
+  // Token csak a headerből
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
+    token = req.headers.authorization.split(" ")[1];
+  }
+
+  ///JWT LOCAL VERSION
+  ///JWT LOCAL VERSION
+  ///JWT LOCAL VERSION
+  if (!token) return next(new AppError("You are not logged in!", 401));
+
+  // Token validálása
+  const decodedToken = await promisify(jwt.verify)(token, process.env.SECRET);
+
+  // Ellenőrizzük, hogy a user még létezik
+  const currentUser = await User.findById(decodedToken.id);
+  if (!currentUser) {
+    return next(
+      new AppError("The user belonging to this token does no longer exist", 401)
+    );
+  }
+
+  // User elérhető a requestben
+  req.user = currentUser;
+  next();
+});
+
+/* export const protect = catchAsync(async (req, res, next) => {
+  let token;
   ///get token and check if it is exits
   if (
     req.headers.authorization &&
@@ -162,7 +219,7 @@ export const protect = catchAsync(async (req, res, next) => {
   ///Grant acces to protected route
   req.user = currentUser;
   next();
-});
+}); */
 
 export function restrictTo(role) {
   return function (req, res, next) {
