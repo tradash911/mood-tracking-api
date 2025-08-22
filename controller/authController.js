@@ -23,8 +23,9 @@ const createSendToken = (user, statusCode, res) => {
     ),
     httpOnly: true,
     path: "/",
-    sameSite: "Lax",
+    sameSite: "None",
     secure: true,
+    domain: "https://wondrous-truffle-e8153b.netlify.app",
   };
 
   //  if (process.env.NODE_ENV === "production") cookieOptions.secure = true;
