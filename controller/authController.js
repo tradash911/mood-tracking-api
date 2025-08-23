@@ -8,7 +8,7 @@ import crypto from "crypto";
 import bcrypt from "bcryptjs";
 /*global process, a*/
 
-const signToken = (user) => {
+/* const signToken = (user) => {
   const token = jwt.sign({ id: user }, process.env.SECRET, {
     expiresIn: process.env.JWT_EXPIRES,
   });
@@ -27,7 +27,6 @@ const createSendToken = (user, statusCode, res) => {
     secure: true,
   };
 
-  //  if (process.env.NODE_ENV === "production") cookieOptions.secure = true;
 
   res.cookie("jwt", token, {
     expires: new Date(
@@ -38,15 +37,6 @@ const createSendToken = (user, statusCode, res) => {
     sameSite: "None",
     secure: true,
   });
-  //  const cookieOptions = {
-  //  expires: new Date(
-  //    Date.now() + process.env.JWT_COOKIES_EXPIRES_IN * 24 * 60 * 60 * 1000
-  //  ),
-  //  httpOnly: true,
-  //  path: "/",
-  //  sameSite: "None",
-  //  };
-  // if (process.env.NODE_ENV === "production") cookieOptions.secure = true;
 
   res.cookie("jwt", token, cookieOptions);
 
@@ -56,6 +46,28 @@ const createSendToken = (user, statusCode, res) => {
   res.status(statusCode).json({
     status: "succes",
     token,
+    data: {
+      user,
+    },
+  });
+}; */
+
+const signToken = (user) => {
+  const token = jwt.sign({ id: user }, process.env.SECRET, {
+    expiresIn: process.env.JWT_EXPIRES,
+  });
+  return token;
+};
+
+const createSendToken = (user, statusCode, res) => {
+  const token = signToken(user._id);
+
+  // Ne tegyük cookie-ba, csak JSON response-ban adjuk vissza
+  user.password = undefined;
+
+  res.status(statusCode).json({
+    status: "success",
+    token, // <-- frontend el fogja tenni localStorage-be
     data: {
       user,
     },
@@ -136,7 +148,7 @@ export const logout = (req, res) => {
     .json({ status: "success", message: "Logged out successfully" });
 };
 
-export const protect = catchAsync(async (req, res, next) => {
+/* export const protect = catchAsync(async (req, res, next) => {
   let token;
   ///get token and check if it is exits
   if (
@@ -166,6 +178,43 @@ export const protect = catchAsync(async (req, res, next) => {
     );
   }
   ///Grant acces to protected route
+  req.user = currentUser;
+  next();
+});
+ */
+
+export const protect = catchAsync(async (req, res, next) => {
+  let token;
+
+  // Token lekérése csak Authorization headerből
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
+    token = req.headers.authorization.split(" ")[1];
+  }
+
+  if (!token) return next(new AppError("You are not logged in!", 401));
+
+  // JWT validálás
+  const decodedToken = await promisify(jwt.verify)(token, process.env.SECRET);
+
+  // Ellenőrizni, hogy a user még létezik-e
+  const currentUser = await User.findById(decodedToken.id);
+  if (!currentUser) {
+    return next(
+      new AppError("The user belonging to this token no longer exists", 401)
+    );
+  }
+
+  // Ellenőrizni, hogy a user nem változtatott-e jelszót
+  if (currentUser.changedPasswordAfter(decodedToken.iat)) {
+    return next(
+      new AppError("User recently changed password, please log in again", 401)
+    );
+  }
+
+  // Protected route hozzáférés engedélyezése
   req.user = currentUser;
   next();
 });
