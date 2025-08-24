@@ -41,7 +41,7 @@ dotenv.config({ path: "./config.env" });
 app.use(
   cors({
     /* origin: "http://localhost:5173", */
-    origin: process.FRONTEND_URL,
+    origin: process.env.FRONTEND_URL,
     credentials: true,
   })
 );
